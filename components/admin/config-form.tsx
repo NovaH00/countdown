@@ -61,11 +61,11 @@ function parseDate(iso: string) {
   const [date, timePart] = iso.includes("T") ? iso.split("T") : [iso, "00:00"]
   const [y, m, d] = date.split("-")
   return {
-    dd: d?.padStart(2, "0") ?? "",
-    mm: m?.padStart(2, "0") ?? "",
+    dd: d ?? "",
+    mm: m ?? "",
     yyyy: y ?? "",
-    hh: (timePart || "00:00").slice(0, 2).padStart(2, "0"),
-    min: (timePart || "00:00").slice(3, 5).padStart(2, "0"),
+    hh: (timePart || "00:00").slice(0, 2),
+    min: (timePart || "00:00").slice(3, 5),
   }
 }
 
@@ -80,7 +80,16 @@ function TimelineDateInput({
   const [prevValue, setPrevValue] = useState(value)
 
   if (value !== prevValue) {
-    setLocalState(parseDate(value))
+    const next = parseDate(value)
+    setLocalState((prev) => {
+      const isEq =
+        parseInt(next.dd || "0") === parseInt(prev.dd || "0") &&
+        parseInt(next.mm || "0") === parseInt(prev.mm || "0") &&
+        parseInt(next.yyyy || "0") === parseInt(prev.yyyy || "0") &&
+        parseInt(next.hh || "0") === parseInt(prev.hh || "0") &&
+        parseInt(next.min || "0") === parseInt(prev.min || "0")
+      return isEq ? prev : next
+    })
     setPrevValue(value)
   }
 
@@ -149,6 +158,7 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
   const [dirty, setDirty] = useState(false)
   const [now, setNow] = useState<number>(0)
   const [mounted, setMounted] = useState(false)
+  const [canSave, setCanSave] = useState(false)
 
   const router = useRouter()
 
@@ -159,8 +169,11 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
     return () => clearInterval(timer)
   }, [])
 
-  // Force disabled on server to match initial client state
-  const isSaveDisabled = !mounted || saving || !dirty
+  useEffect(() => {
+    setCanSave(!saving && dirty)
+  }, [saving, dirty])
+
+  const isSaveDisabled = !canSave
 
   useSSE("/api/admin/events", {
     "timer:state": (data: unknown) => {
