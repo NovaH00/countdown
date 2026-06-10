@@ -1,5 +1,5 @@
 {
-  "endAt": null,
-  "remainingMs": 0,
-  "isRunning": false
+  "isRunning": true,
+  "endAt": 1781071307890,
+  "forcedEventIndex": null
 }

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { isAuthenticated } from "@/lib/auth"
-import { getConfig } from "@/lib/config"
 import { getTimerState, setTimerState } from "@/lib/timer"
 import { broadcast } from "@/lib/sse"
 
@@ -20,42 +19,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { action } = await request.json()
+  const body = await request.json()
+  const { action } = body
   const state = await getTimerState()
 
-  const config = await getConfig()
-
   switch (action) {
-    case "start": {
-      if (config.timerType === "duration") {
-        const durationMs = config.durationMinutes * 60 * 1000
-        state.endAt = Date.now() + durationMs
-        state.remainingMs = durationMs
-      }
+    case "start":
+    case "resume":
       state.isRunning = true
+      if (state.endAt === null) state.endAt = Date.now()
       break
-    }
-    case "pause": {
-      if (config.timerType === "duration" && state.isRunning && state.endAt) {
-        state.remainingMs = Math.max(0, state.endAt - Date.now())
-        state.endAt = null
-      }
+    case "pause":
       state.isRunning = false
       break
-    }
-    case "resume": {
-      if (config.timerType === "duration" && state.remainingMs > 0) {
-        state.endAt = Date.now() + state.remainingMs
-      }
-      state.isRunning = true
-      break
-    }
-    case "reset": {
+    case "reset":
+      state.isRunning = false
       state.endAt = null
-      state.remainingMs = 0
-      state.isRunning = false
+      state.forcedEventIndex = null
       break
-    }
+    case "setEvent":
+      state.forcedEventIndex = body.index ?? null
+      break
     default:
       return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   }

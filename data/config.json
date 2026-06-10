@@ -1,29 +1,29 @@
 {
-  "timerType": "datetime",
-  "title": "Kỳ thi THPT Quốc Gia",
-  "message": "Chuẩn bị tốt nhất cho kỳ thi quan trọng sắp tới!",
-  "eventDate": "2026-06-12T07:00:00+07:00",
-  "durationMinutes": 90,
+  "title": "Kỳ Thi THPT Quốc Gia 2026",
+  "timeline": [
+    {
+      "name": "Chờ thi",
+      "endTime": "2026-06-01T07:30:00+07:00"
+    },
+    {
+      "name": "Giờ Giải Lao",
+      "endTime": "2026-06-25T08:00:00+07:00"
+    },
+    {
+      "name": "Toán",
+      "endTime": "2026-06-25T10:30:00+07:00"
+    },
+    {
+      "name": "Giải lao",
+      "endTime": "2026-06-25T11:00:00+07:00"
+    }
+  ],
   "enabledUnits": {
     "days": true,
     "hours": true,
     "minutes": true,
     "seconds": true
   },
-  "bgColor": "#ffffff",
-  "accentColor": "#fbbf24",
-  "subjects": [
-    {
-      "name": "Toán",
-      "durationMinutes": 90
-    },
-    {
-      "name": "Ngữ Văn",
-      "durationMinutes": 120
-    },
-    {
-      "name": "Tiếng Anh",
-      "durationMinutes": 60
-    }
-  ]
+  "bgColor": "#274F9D",
+  "accentColor": "#ECC253"
 }

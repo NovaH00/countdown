@@ -26,12 +26,21 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Thiếu tiêu đề" }, { status: 400 })
   }
 
-  if (body.timerType === "datetime" && !body.eventDate) {
-    return NextResponse.json({ error: "Thiếu thời gian" }, { status: 400 })
+  if (!body.timeline || body.timeline.length === 0) {
+    return NextResponse.json({ error: "Thiếu danh sách sự kiện" }, { status: 400 })
   }
 
-  if (!Array.isArray(body.subjects)) {
-    return NextResponse.json({ error: "Danh sách môn thi không hợp lệ" }, { status: 400 })
+  for (let i = 0; i < body.timeline.length; i++) {
+    const item = body.timeline[i]
+    if (!item.name) {
+      return NextResponse.json({ error: `Sự kiện ${i + 1} thiếu tên` }, { status: 400 })
+    }
+    if (!item.endTime) {
+      return NextResponse.json({ error: `Sự kiện ${i + 1} thiếu thời gian` }, { status: 400 })
+    }
+    if (isNaN(new Date(item.endTime).getTime())) {
+      return NextResponse.json({ error: `Sự kiện ${i + 1} thời gian không hợp lệ` }, { status: 400 })
+    }
   }
 
   const updated = await updateConfig(body)

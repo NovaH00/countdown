@@ -1,16 +1,11 @@
-export type TimerType = "datetime" | "duration"
-
-export interface SubjectConfig {
+export interface TimelineEvent {
   name: string
-  durationMinutes: number
+  endTime: string
 }
 
 export interface CountdownConfig {
-  timerType: TimerType
   title: string
-  message: string
-  eventDate: string
-  durationMinutes: number
+  timeline: TimelineEvent[]
   enabledUnits: {
     days: boolean
     hours: boolean
@@ -19,5 +14,4 @@ export interface CountdownConfig {
   }
   bgColor: string
   accentColor: string
-  subjects: SubjectConfig[]
 }
