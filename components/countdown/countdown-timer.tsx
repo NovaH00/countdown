@@ -5,7 +5,6 @@ import Image from "next/image"
 import { useCountdown } from "@/hooks/use-countdown"
 import { useSubjectTimer } from "@/hooks/use-subject-timer"
 import { TimeBlock } from "./time-block"
-import { SeparatorDot } from "./separator-dot"
 import type { CountdownConfig } from "@/types/config"
 import type { TimerState } from "@/lib/timer-types"
 
@@ -56,7 +55,7 @@ function DateTimeCountdown({
   if (isIdle) {
     return (
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl text-blue-300">
+        <p className="text-2xl sm:text-3xl text-black">
           Đồng hồ chưa bắt đầu
         </p>
       </div>
@@ -65,7 +64,7 @@ function DateTimeCountdown({
 
   if (isExpired) {
     return (
-      <p className="text-4xl sm:text-6xl font-bold text-amber-400 text-center">
+      <p className="text-4xl sm:text-6xl font-bold text-black text-center">
         Đã đến giờ thi!
       </p>
     )
@@ -76,7 +75,6 @@ function DateTimeCountdown({
       {units.map((unit, index) => (
         <div key={unit.label} className="flex items-center gap-2 sm:gap-4">
           <TimeBlock value={unit.value} label={unit.label} />
-          {index < units.length - 1 && <SeparatorDot />}
         </div>
       ))}
     </div>
@@ -100,10 +98,10 @@ function DurationCountdown({
   if (isIdle) {
     return (
       <div className="text-center">
-        <p className="text-2xl sm:text-3xl text-blue-300">
+        <p className="text-2xl sm:text-3xl text-black">
           Đồng hồ chưa bắt đầu
         </p>
-        <p className="mt-2 text-lg text-blue-400/60">
+        <p className="mt-2 text-lg text-black">
           {config.durationMinutes} phút
         </p>
       </div>
@@ -113,10 +111,10 @@ function DurationCountdown({
   if (isExpired) {
     return (
       <div className="text-center">
-        <p className="text-5xl sm:text-7xl font-bold text-amber-400">
+        <p className="text-5xl sm:text-7xl font-bold text-black">
           Hết giờ!
         </p>
-        <p className="mt-4 text-xl text-blue-200/80">
+        <p className="mt-4 text-xl text-black">
           Đã hết thời gian
         </p>
       </div>
@@ -128,7 +126,6 @@ function DurationCountdown({
       {units.map((unit, index) => (
         <div key={unit.label} className="flex items-center gap-2 sm:gap-4">
           <TimeBlock value={unit.value} label={unit.label} />
-          {index < units.length - 1 && <SeparatorDot />}
         </div>
       ))}
     </div>
@@ -148,7 +145,7 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
       <GlowOrbs accentColor={config.accentColor} />
 
       <div className="relative z-10 flex justify-center pt-8 sm:pt-12">
-        <div className="relative w-[260px] h-[117px] sm:w-[480px] sm:h-[216px]">
+        <div className="relative w-[200px] h-[90px] sm:w-[360px] sm:h-[162px]">
           <Image
             src="/logos/LHU&ASU-03.png"
             alt="LHU & ASU"
@@ -162,13 +159,13 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-10 px-4">
         {config.title && (
-          <h1 className="text-3xl sm:text-5xl font-bold text-white text-center">
+          <h1 className="text-3xl sm:text-5xl font-bold text-blue-600 text-center">
             {config.title}
           </h1>
         )}
 
         {config.message && (
-          <p className="text-base sm:text-xl text-blue-200/80 text-center max-w-xl">
+          <p className="text-base sm:text-xl text-black text-center max-w-xl">
             {config.message}
           </p>
         )}
@@ -181,7 +178,7 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
       </div>
 
       <div className="relative z-10 flex justify-center pb-8 sm:pb-12 mt-12 sm:mt-20">
-        <div className="bg-white rounded-xl flex flex-wrap justify-center gap-6 sm:gap-12 py-4 sm:py-6 px-6 sm:px-10 shadow-lg">
+        <div className="flex flex-wrap justify-center gap-10 sm:gap-16">
           {BOTTOM_LOGOS.map((logo) => (
             <div key={logo.src} className="relative w-[90px] h-[68px] sm:w-[140px] sm:h-[105px]">
               <Image
