@@ -178,7 +178,7 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
       </div>
 
       <div className="relative z-10 flex justify-center pb-8 sm:pb-12 mt-12 sm:mt-20">
-        <div className="flex flex-wrap justify-center gap-10 sm:gap-16">
+        <div className="flex flex-wrap justify-center gap-16 sm:gap-24">
           {BOTTOM_LOGOS.map((logo) => (
             <div key={logo.src} className="relative w-[90px] h-[68px] sm:w-[140px] sm:h-[105px]">
               <Image

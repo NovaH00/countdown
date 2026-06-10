@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,7 +62,7 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
   const [timerState, setTimerState] = useState<TimerState>(initialTimer)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null)
-  const [lastSaved, setLastSaved] = useState(initial)
+  const [dirty, setDirty] = useState(false)
 
   const router = useRouter()
 
@@ -72,13 +72,28 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
     }, []),
   })
 
-  const [date, time] = config.eventDate.includes("T")
-    ? config.eventDate.split("T")
-    : [config.eventDate, "00:00"]
-  const localDatetime = `${date}T${time.slice(0, 5)}`
+  const initialDate = useRef(parseDate(initial.eventDate))
+  const [dd, setDd] = useState(initialDate.current.dd)
+  const [mm, setMm] = useState(initialDate.current.mm)
+  const [yyyy, setYyyy] = useState(initialDate.current.yyyy)
+  const [hh, setHh] = useState(initialDate.current.hh)
+  const [min, setMin] = useState(initialDate.current.min)
+
+  function parseDate(iso: string) {
+    const [date, timePart] = iso.includes("T") ? iso.split("T") : [iso, "00:00"]
+    const [y, m, d] = date.split("-")
+    return {
+      dd: d ?? "",
+      mm: m ?? "",
+      yyyy: y ?? "",
+      hh: timePart.slice(0, 2),
+      min: timePart.slice(3, 5),
+    }
+  }
 
   function update<K extends keyof CountdownConfig>(key: K, value: CountdownConfig[K]) {
     setConfig((prev) => ({ ...prev, [key]: value }))
+    setDirty(true)
   }
 
   const timerAction = useCallback(async (action: string) => {
@@ -125,7 +140,7 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
       }
 
       setToast({ type: "success", message: "Đã lưu!" })
-      setLastSaved(config)
+      setDirty(false)
     } catch {
       setToast({ type: "error", message: "Có lỗi xảy ra" })
     } finally {
@@ -145,7 +160,6 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
 
   const isIdle = !timerState.isRunning && timerState.remainingMs === 0 && !timerState.endAt
   const isPaused = !timerState.isRunning && !isIdle
-  const dirty = JSON.stringify(config) !== JSON.stringify(lastSaved)
 
   return (
     <div className="mx-auto max-w-xl">
@@ -216,12 +230,41 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
           {config.timerType === "datetime" ? (
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-medium text-blue-300">Ngày & giờ</Label>
-              <Input
-                type="datetime-local"
-                value={localDatetime}
-                onChange={(e) => { const v = e.target.value; if (v) update("eventDate", `${v}:00+07:00`) }}
-                className="border-blue-800/50 bg-blue-950/40 text-white [color-scheme:dark] h-8 text-sm"
-              />
+              <div className="flex items-center gap-1.5">
+                <Input
+                  type="text" inputMode="numeric"
+                  value={dd}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 2); setDd(v); update("eventDate", `${yyyy}-${mm}-${v.padStart(2,"0")}T${hh}:${min}:00+07:00`) }}
+                  className="border-blue-800/50 bg-blue-950/40 text-white h-8 text-sm w-14 text-center"
+                />
+                <span className="text-blue-300">/</span>
+                <Input
+                  type="text" inputMode="numeric"
+                  value={mm}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 2); setMm(v); update("eventDate", `${yyyy}-${v.padStart(2,"0")}-${dd}T${hh}:${min}:00+07:00`) }}
+                  className="border-blue-800/50 bg-blue-950/40 text-white h-8 text-sm w-14 text-center"
+                />
+                <span className="text-blue-300">/</span>
+                <Input
+                  type="text" inputMode="numeric"
+                  value={yyyy}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 4); setYyyy(v); update("eventDate", `${v}-${mm}-${dd}T${hh}:${min}:00+07:00`) }}
+                  className="border-blue-800/50 bg-blue-950/40 text-white h-8 text-sm w-20 text-center"
+                />
+                <Input
+                  type="text" inputMode="numeric"
+                  value={hh}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 2); setHh(v); update("eventDate", `${yyyy}-${mm}-${dd}T${v.padStart(2,"0")}:${min}:00+07:00`) }}
+                  className="border-blue-800/50 bg-blue-950/40 text-white h-8 text-sm w-14 text-center"
+                />
+                <span className="text-blue-300">:</span>
+                <Input
+                  type="text" inputMode="numeric"
+                  value={min}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 2); setMin(v); update("eventDate", `${yyyy}-${mm}-${dd}T${hh}:${v.padStart(2,"0")}:00+07:00`) }}
+                  className="border-blue-800/50 bg-blue-950/40 text-white h-8 text-sm w-14 text-center"
+                />
+              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -237,7 +280,7 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
                 <label key={key} className="flex items-center gap-2 text-xs cursor-pointer text-blue-200 hover:text-white transition-colors">
                   <Checkbox
                     checked={config.enabledUnits[key]}
-                    onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, enabledUnits: { ...prev.enabledUnits, [key]: checked === true } }))}
+                    onCheckedChange={(checked) => { setConfig((prev) => ({ ...prev, enabledUnits: { ...prev.enabledUnits, [key]: checked === true } })); setDirty(true) }}
                     className="border-blue-600 data-[state=checked]:bg-blue-600 h-3.5 w-3.5"
                   />
                   {label}
