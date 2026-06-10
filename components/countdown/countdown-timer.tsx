@@ -6,6 +6,7 @@ import Image from "next/image"
 import { useCountdown } from "@/hooks/use-countdown"
 
 import { TimeBlock } from "./time-block"
+import { GlowOrbs } from "./glow-orbs"
 import type { CountdownConfig, TimelineEvent } from "@/types/config"
 import type { TimerState } from "@/lib/timer-types"
 
@@ -144,11 +145,9 @@ function CountdownDisplay({
           {currentEvent.event.name}
         </p>
       )}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-1.5 min-[400px]:gap-2 sm:gap-4">
         {units.map((unit) => (
-          <div key={unit.label} className="flex items-center gap-2 sm:gap-4">
-            <TimeBlock value={unit.value} label={unit.label} />
-          </div>
+          <TimeBlock key={unit.label} value={unit.value} label={unit.label} />
         ))}
       </div>
     </div>
@@ -174,6 +173,7 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: config.bgColor }}>
+      <GlowOrbs accentColor={config.accentColor} />
 
       <div className="relative z-10 flex justify-center pt-2 sm:pt-4">
         <div className="relative w-[200px] h-[90px] sm:w-[360px] sm:h-[162px]">
@@ -189,13 +189,13 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
       </div>
 
       {!isIdle && (
-        <div className="absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-20">
+        <div className="hidden lg:block absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-20">
           <TimelineBranch timeline={config.timeline} now={now} forcedIndex={timerState.forcedEventIndex} />
         </div>
       )}
 
       <div className="relative z-10 flex-1 flex items-center justify-center px-4">
-        <div className="flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center gap-10 w-full">
           {config.title && (
             <h1 className="text-3xl sm:text-6xl font-black text-white text-center uppercase tracking-tighter">
               {config.title}
@@ -203,6 +203,12 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
           )}
 
           <CountdownDisplay config={config} now={now} timerState={timerState} />
+
+          {!isIdle && (
+            <div className="lg:hidden mt-8 w-full max-w-sm px-6 self-center">
+              <TimelineBranch timeline={config.timeline} now={now} forcedIndex={timerState.forcedEventIndex} />
+            </div>
+          )}
         </div>
       </div>
 
