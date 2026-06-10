@@ -3,6 +3,11 @@ export interface TimelineEvent {
   endTime: string
 }
 
+export interface RedirectButton {
+  name: string
+  link: string
+}
+
 export interface CountdownConfig {
   title: string
   timeline: TimelineEvent[]
@@ -14,4 +19,7 @@ export interface CountdownConfig {
   }
   bgColor: string
   accentColor: string
+  activeScreen?: "countdown" | "redirects"
+  redirects?: RedirectButton[]
+  redirectsTitle?: string
 }

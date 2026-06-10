@@ -43,6 +43,18 @@ export async function PUT(request: Request) {
     }
   }
 
+  if (body.redirects) {
+    for (let i = 0; i < body.redirects.length; i++) {
+      const btn = body.redirects[i]
+      if (!btn.name) {
+        return NextResponse.json({ error: `Nút ${i + 1} thiếu tên hiển thị` }, { status: 400 })
+      }
+      if (!btn.link) {
+        return NextResponse.json({ error: `Nút ${i + 1} thiếu đường dẫn liên kết (URL)` }, { status: 400 })
+      }
+    }
+  }
+
   const updated = await updateConfig(body)
   broadcast("config:updated", updated)
   return NextResponse.json(updated)

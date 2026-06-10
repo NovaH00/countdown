@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { CountdownTimer } from "./countdown-timer"
+import { RedirectPage } from "./redirect-page"
 import { useSSE } from "@/hooks/use-sse"
 import type { CountdownConfig } from "@/types/config"
 import type { TimerState } from "@/lib/timer-types"
@@ -37,7 +38,11 @@ export function CountdownPage({
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: config.bgColor }}>
-      <CountdownTimer config={config} timerState={timerState} />
+      {config.activeScreen === "redirects" ? (
+        <RedirectPage config={config} />
+      ) : (
+        <CountdownTimer config={config} timerState={timerState} />
+      )}
     </div>
   )
 }

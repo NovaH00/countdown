@@ -25,5 +25,29 @@
     "seconds": true
   },
   "bgColor": "#274F9D",
-  "accentColor": "#ECC253"
+  "accentColor": "#ECC253",
+  "activeScreen": "redirects",
+  "redirects": [
+    {
+      "name": "Lịch Sử",
+      "link": "example.com"
+    },
+    {
+      "name": "Vật Lý",
+      "link": "example.com"
+    },
+    {
+      "name": "Toán",
+      "link": "example.com"
+    },
+    {
+      "name": "Địa Lý",
+      "link": "a"
+    },
+    {
+      "name": "Công Nghệ",
+      "link": "a"
+    }
+  ],
+  "redirectsTitle": "Đáp Án"
 }
