@@ -82,6 +82,20 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
   }
 
   const timerAction = useCallback(async (action: string) => {
+    setTimerState((prev) => {
+      switch (action) {
+        case "start":
+        case "resume":
+          return { ...prev, isRunning: true }
+        case "pause":
+          return { ...prev, isRunning: false }
+        case "reset":
+          return { isRunning: false, remainingMs: 0, endAt: null }
+        default:
+          return prev
+      }
+    })
+
     const res = await fetch("/api/admin/timer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -93,7 +107,7 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
     }
   }, [])
 
-  async function saveAndRun() {
+  async function save() {
     setSaving(true)
     setToast(null)
 
@@ -110,17 +124,18 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
         return
       }
 
-      if (config.timerType === "duration") {
-        await timerAction("start")
-      }
-
-      setToast({ type: "success", message: "Đã lưu và chạy!" })
+      setToast({ type: "success", message: "Đã lưu!" })
       setLastSaved(config)
     } catch {
       setToast({ type: "error", message: "Có lỗi xảy ra" })
     } finally {
       setSaving(false)
     }
+  }
+
+  async function run() {
+    setToast(null)
+    await timerAction("start")
   }
 
   async function handleLogout() {
@@ -131,7 +146,6 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
   const isIdle = !timerState.isRunning && timerState.remainingMs === 0 && !timerState.endAt
   const isPaused = !timerState.isRunning && !isIdle
   const dirty = JSON.stringify(config) !== JSON.stringify(lastSaved)
-  const canSave = dirty || isIdle
 
   return (
     <div className="mx-auto max-w-xl">
@@ -234,32 +248,40 @@ export function ConfigForm({ config: initial, timerState: initialTimer }: Config
         </div>
 
         <button
-          onClick={saveAndRun}
-          disabled={saving || !canSave}
+          onClick={save}
+          disabled={saving || !dirty}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-blue-600/30 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {saving ? (
-            <><svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Đang xử lý...</>
+            <><svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Đang lưu...</>
           ) : (
-            <>▶ Lưu & Chạy</>
+            <>💾 Lưu</>
           )}
         </button>
 
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2 text-xs text-blue-400">
-            <span>Trạng thái:</span>
+        <div className="rounded-xl border border-blue-800/30 bg-blue-950/40 backdrop-blur-sm p-5 space-y-4">
+          <h2 className="text-sm font-semibold text-blue-200">Điều khiển</h2>
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-blue-400">Trạng thái:</span>
             {timerState.isRunning ? (
-              <span className="inline-flex items-center gap-1 text-emerald-400">
+              <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Đang chạy
               </span>
             ) : isPaused ? (
-              <span className="text-amber-400">Đã tạm dừng</span>
+              <span className="text-xs text-amber-400">Đã tạm dừng</span>
             ) : (
-              <span className="text-blue-400">Chưa bắt đầu</span>
+              <span className="text-xs text-blue-400">Chưa bắt đầu</span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex flex-wrap items-center gap-2">
+            {isIdle && (
+              <Button onClick={run} className="bg-emerald-600 hover:bg-emerald-500 text-white h-8 text-sm px-4">
+                ▶ Chạy
+              </Button>
+            )}
             {timerState.isRunning ? (
               <Button size="sm" onClick={() => timerAction("pause")} className="bg-amber-600 hover:bg-amber-500 text-white h-8 text-xs px-3">
                 ⏸ Tạm dừng

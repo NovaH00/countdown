@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Image from "next/image"
 import { useCountdown } from "@/hooks/use-countdown"
 import { useSubjectTimer } from "@/hooks/use-subject-timer"
 import { TimeBlock } from "./time-block"
@@ -36,13 +37,31 @@ function getDisplayUnits(totalSec: number, enabledUnits: CountdownConfig["enable
   return units
 }
 
-function DateTimeCountdown({ config }: { config: CountdownConfig }) {
+function DateTimeCountdown({
+  config,
+  timerState,
+}: {
+  config: CountdownConfig
+  timerState: TimerState
+}) {
   const { days, hours, minutes, seconds, isExpired } = useCountdown(
     config.eventDate
   )
 
   const totalSec = days * 86400 + hours * 3600 + minutes * 60 + seconds
   const units = getDisplayUnits(totalSec, config.enabledUnits)
+
+  const isIdle = !timerState.isRunning && timerState.remainingMs === 0 && !timerState.endAt
+
+  if (isIdle) {
+    return (
+      <div className="text-center">
+        <p className="text-2xl sm:text-3xl text-blue-300">
+          Đồng hồ chưa bắt đầu
+        </p>
+      </div>
+    )
+  }
 
   if (isExpired) {
     return (
@@ -116,12 +135,32 @@ function DurationCountdown({
   )
 }
 
+const BOTTOM_LOGOS = [
+  { src: "/logos/AI_Robotic-01.png", alt: "AI & Robotic" },
+  { src: "/logos/Khoa_CNTT-02.png", alt: "Khoa CNTT" },
+  { src: "/logos/Lab_T&A-04.png", alt: "Lab T&A" },
+  { src: "/logos/Media_T&A-05.png", alt: "Media T&A" },
+]
+
 export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen flex flex-col overflow-hidden">
       <GlowOrbs accentColor={config.accentColor} />
 
-      <div className="relative z-10 flex flex-col items-center gap-10 px-4">
+      <div className="relative z-10 flex justify-center pt-8 sm:pt-12">
+        <div className="relative w-[260px] h-[117px] sm:w-[480px] sm:h-[216px]">
+          <Image
+            src="/logos/LHU&ASU-03.png"
+            alt="LHU & ASU"
+            fill
+            className="object-contain"
+            sizes="(max-width: 640px) 300px, 540px"
+            preload
+          />
+        </div>
+      </div>
+
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-10 px-4">
         {config.title && (
           <h1 className="text-3xl sm:text-5xl font-bold text-white text-center">
             {config.title}
@@ -137,8 +176,24 @@ export function CountdownTimer({ config, timerState }: CountdownTimerProps) {
         {config.timerType === "duration" ? (
           <DurationCountdown config={config} timerState={timerState} />
         ) : (
-          <DateTimeCountdown config={config} />
+          <DateTimeCountdown config={config} timerState={timerState} />
         )}
+      </div>
+
+      <div className="relative z-10 flex justify-center pb-8 sm:pb-12 mt-12 sm:mt-20">
+        <div className="bg-white rounded-xl flex flex-wrap justify-center gap-6 sm:gap-12 py-4 sm:py-6 px-6 sm:px-10 shadow-lg">
+          {BOTTOM_LOGOS.map((logo) => (
+            <div key={logo.src} className="relative w-[90px] h-[68px] sm:w-[140px] sm:h-[105px]">
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 120px, 200px"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -23,28 +23,31 @@ export async function POST(request: Request) {
   const { action } = await request.json()
   const state = await getTimerState()
 
+  const config = await getConfig()
+
   switch (action) {
     case "start": {
-      const config = await getConfig()
-      const durationMs = config.durationMinutes * 60 * 1000
-      state.endAt = Date.now() + durationMs
-      state.remainingMs = durationMs
+      if (config.timerType === "duration") {
+        const durationMs = config.durationMinutes * 60 * 1000
+        state.endAt = Date.now() + durationMs
+        state.remainingMs = durationMs
+      }
       state.isRunning = true
       break
     }
     case "pause": {
-      if (state.isRunning && state.endAt) {
+      if (config.timerType === "duration" && state.isRunning && state.endAt) {
         state.remainingMs = Math.max(0, state.endAt - Date.now())
+        state.endAt = null
       }
-      state.endAt = null
       state.isRunning = false
       break
     }
     case "resume": {
-      if (state.remainingMs > 0) {
+      if (config.timerType === "duration" && state.remainingMs > 0) {
         state.endAt = Date.now() + state.remainingMs
-        state.isRunning = true
       }
+      state.isRunning = true
       break
     }
     case "reset": {

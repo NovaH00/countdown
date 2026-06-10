@@ -24,5 +24,5 @@ export function useSSE(url: string, handlers: Record<string, EventHandler>) {
     }
 
     return () => es.close()
-  }, [url, handlers])
+  }, [url])
 }

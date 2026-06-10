@@ -6,7 +6,7 @@
   "durationMinutes": 90,
   "enabledUnits": {
     "days": false,
-    "hours": true,
+    "hours": false,
     "minutes": true,
     "seconds": true
   },
