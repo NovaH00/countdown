@@ -1,0 +1,29 @@
+{
+  "timerType": "duration",
+  "title": "Kỳ thi THPT Quốc Gia",
+  "message": "Chuẩn bị tốt nhất cho kỳ thi quan trọng sắp tới!",
+  "eventDate": "2026-06-26T07:00:00+07:00",
+  "durationMinutes": 90,
+  "enabledUnits": {
+    "days": false,
+    "hours": true,
+    "minutes": true,
+    "seconds": true
+  },
+  "bgColor": "#0f172a",
+  "accentColor": "#fbbf24",
+  "subjects": [
+    {
+      "name": "Toán",
+      "durationMinutes": 90
+    },
+    {
+      "name": "Ngữ Văn",
+      "durationMinutes": 120
+    },
+    {
+      "name": "Tiếng Anh",
+      "durationMinutes": 60
+    }
+  ]
+}
